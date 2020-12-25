@@ -21,7 +21,14 @@ class AuthServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole() && $assets = $extension->assets()) {
             $this->publishes(
-                [$assets => public_path('vendor/iwindy/admin-auth')],
+                [$assets => public_path('vendor/iwindy/laravel-admin-auth')],
+                'laravel-admin-auth'
+            );
+        }
+
+        if ($this->app->runningInConsole() && $lang = $extension->lang()) {
+            $this->publishes(
+                [$lang => resource_path('lang')],
                 'laravel-admin-auth'
             );
         }

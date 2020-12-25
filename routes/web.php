@@ -1,5 +1,8 @@
 <?php
 
-use Iwindy\Auth\Http\Controllers\AuthController;
+use Iwindy\Auth\Http\Controllers\AdminController;
+use Iwindy\Auth\Http\Controllers\RolesController;
 
-Route::get('laravel-admin-auth', AuthController::class.'@index');
+$router->resource('auth/roles', RolesController::class);
+$router->resource('auth/admin', AdminController::class);
+
