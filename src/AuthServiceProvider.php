@@ -2,7 +2,9 @@
 
 namespace Iwindy\Auth;
 
+use Encore\Admin\Form;
 use Illuminate\Support\ServiceProvider;
+use Iwindy\Auth\Form\Field\CheckboxGroup;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -11,8 +13,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot(Auth $extension)
     {
-        if (! Auth::boot()) {
-            return ;
+        if (!Auth::boot()) {
+            return;
         }
 
         if ($views = $extension->views()) {
@@ -22,19 +24,21 @@ class AuthServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole() && $assets = $extension->assets()) {
             $this->publishes(
                 [$assets => public_path('vendor/iwindy/laravel-admin-auth')],
-                'laravel-admin-auth'
+                'assets'
             );
         }
 
         if ($this->app->runningInConsole() && $lang = $extension->lang()) {
+            $this->publishes([$lang => resource_path('lang')], 'lang');
+        }
+
+        if ($this->app->runningInConsole()) {
             $this->publishes(
-                [$lang => resource_path('lang')],
-                'laravel-admin-auth'
+                [__DIR__ . '/../routes/web.php' => admin_path('routes.php')],
+                'routes'
             );
         }
 
-        $this->app->booted(function () {
-            Auth::routes(__DIR__.'/../routes/web.php');
-        });
+        Form::extend('checkboxGroup', CheckboxGroup::class);
     }
 }

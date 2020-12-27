@@ -16,6 +16,7 @@ class Auth extends Extension
 
     public $lang = __DIR__.'/../resources/lang';
 
+
     public $menu = [
         'title' => 'Auth',
         'path'  => 'laravel-admin-auth',
@@ -25,5 +26,6 @@ class Auth extends Extension
     public function lang(){
         return $this->lang;
     }
+
 
 }
