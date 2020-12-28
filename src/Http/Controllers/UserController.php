@@ -146,6 +146,14 @@ class UserController extends BaseController
 
         // 三个全部去掉
         $form->disableFooterCheck();
+        $form->tools(function (Form\Tools $tools) {
+            // 去掉`列表`按钮
+            // $tools->disableList();
+            // 去掉`删除`按钮
+            // $tools->disableDelete();
+            // 去掉`查看`按钮
+            $tools->disableView();
+        });
         return $content->body($form);
     }
 
