@@ -7,6 +7,7 @@ use Encore\Admin\Http\Controllers\AdminController as BaseController;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Encore\Admin\Table;
+use Illuminate\Support\Facades\Auth;
 use Iwindy\Auth\Table\Actions\Users\SetPermissions;
 use Spatie\Permission\Models\Permission;
 
@@ -117,7 +118,7 @@ class UserController extends BaseController
         return $form;
     }
 
-    public function showPermissions( Content $content)
+    public function showPermissions(Content $content)
     {
         $id = \Request::input('id');
         $userModel = config('admin.database.users_model');
@@ -128,17 +129,18 @@ class UserController extends BaseController
         $form->setTitle(__('auth.set_permissions'));
         $form->hidden('permissions.id')->value($id);
 
-        $form->checkboxGroup('permissions.list', trans('admin.permissions'))->options(function (){
-            $permissions =  Permission::where('guard_name',config('auth.defaults.guard'))->get()->toArray();
+        $form->checkboxGroup('permissions.list', trans('admin.permissions'))->options(function () {
+            $permissions = Permission::where('guard_name', config('auth.defaults.guard'))->get()->toArray();
             $new_permissions = [];
             foreach ($permissions as $keys => $values) {
-                if(strpos($values['name'],'.') !== false){
+                if (strpos($values['name'], '.') !== false) {
                     $group = explode('.', $values['name']);
-                    $new_permissions[$group[0]][$values['name']] = $group[1];
-                }else{
-                    $new_permissions[$values['name']] = $values['name'];
+                    $new_permissions[__('auth.' . $group[0])][__($values['name'])] = __('auth.' . $group[1]);
+                } else {
+                    $new_permissions[$values['name']] = __('auth.' . $values['name']);
                 }
             }
+            // dd($new_permissions);
             return $new_permissions;
         })->checked($user->permissions->pluck('name'));
 
@@ -155,18 +157,18 @@ class UserController extends BaseController
         $user = $userModel::findOrFail($id);
 
         $diff_add = collect($permissions)->whereNotNull()->diff($user->permissions->pluck('name'))->toArray();
-        if(!empty($diff_add)){
+        if (!empty($diff_add)) {
             $user->givePermissionTo($diff_add);
         }
         $diff_del = collect($user->permissions->pluck('name'))->diff($permissions)->toArray();
-        if(!empty($diff_del)){
+        if (!empty($diff_del)) {
             $user->revokePermissionTo($diff_del);
         }
 
-       return response()->json([
-           'status'=> true,
-           'message' =>'编辑成功'
-       ]);
+        return response()->json([
+            'status'  => true,
+            'message' => '编辑成功'
+        ]);
     }
 
 }
