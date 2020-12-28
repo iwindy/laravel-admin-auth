@@ -4,8 +4,11 @@ namespace Iwindy\Auth\Http\Controllers;
 
 use Encore\Admin\Form;
 use Encore\Admin\Http\Controllers\AdminController as BaseController;
+use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
 use Encore\Admin\Table;
+use Iwindy\Auth\Table\Actions\Users\SetPermissions;
+use Spatie\Permission\Models\Permission;
 
 class UserController extends BaseController
 {
@@ -39,6 +42,7 @@ class UserController extends BaseController
             if ($actions->getKey() == 1) {
                 $actions->disableDelete();
             }
+            $actions->add(new SetPermissions());
         });
 
         $table->tools(function (Table\Tools $tools) {
@@ -103,7 +107,6 @@ class UserController extends BaseController
 
         $form->display('created_at', trans('admin.created_at'));
         $form->display('updated_at', trans('admin.updated_at'));
-        $form->checkboxGroup('permissions', trans('admin.permissions'))->options([1 => 'foo', 'ssss' => [1=>'foot'], 'val' => 'Option name'])->related('roles', 'permissions');
 
         $form->saving(function (Form $form) {
             if ($form->password && $form->model()->password != $form->password) {
@@ -113,4 +116,57 @@ class UserController extends BaseController
 
         return $form;
     }
+
+    public function showPermissions( Content $content)
+    {
+        $id = \Request::input('id');
+        $userModel = config('admin.database.users_model');
+
+        $user = $userModel::findOrFail($id);
+        $form = new Form($user);
+        $form->setAction(route('admin.set-permissions'));
+        $form->setTitle(__('auth.set_permissions'));
+        $form->hidden('permissions.id')->value($id);
+
+        $form->checkboxGroup('permissions.list', trans('admin.permissions'))->options(function (){
+            $permissions =  Permission::where('guard_name',config('auth.defaults.guard'))->get()->toArray();
+            $new_permissions = [];
+            foreach ($permissions as $keys => $values) {
+                if(strpos($values['name'],'.') !== false){
+                    $group = explode('.', $values['name']);
+                    $new_permissions[$group[0]][$values['name']] = $group[1];
+                }else{
+                    $new_permissions[$values['name']] = $values['name'];
+                }
+            }
+            return $new_permissions;
+        })->checked($user->permissions->pluck('name'));
+
+        // 三个全部去掉
+        $form->disableFooterCheck();
+        return $content->body($form);
+    }
+
+    public function setPermissions(Content $content)
+    {
+        $id = \Request::input('permissions.id');
+        $permissions = \Request::input('permissions.list');
+        $userModel = config('admin.database.users_model');
+        $user = $userModel::findOrFail($id);
+
+        $diff_add = collect($permissions)->whereNotNull()->diff($user->permissions->pluck('name'))->toArray();
+        if(!empty($diff_add)){
+            $user->givePermissionTo($diff_add);
+        }
+        $diff_del = collect($user->permissions->pluck('name'))->diff($permissions)->toArray();
+        if(!empty($diff_del)){
+            $user->revokePermissionTo($diff_del);
+        }
+
+       return response()->json([
+           'status'=> true,
+           'message' =>'编辑成功'
+       ]);
+    }
+
 }

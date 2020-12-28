@@ -36,6 +36,8 @@ Route::group([
 ], function (Router $router) {
     $router->resource('auth/roles', 'RolesController');
     $router->resource('auth/admin', 'AdminController');
+    $router->get('auth/users/showPermissions', 'UserController@showPermissions')->name('show-permissions');
+    $router->post('auth/users/setPermissions', 'UserController@setPermissions')->name('set-permissions');
     $router->resource('auth/users', 'UserController')->names('auth_users');
     $router->resource('auth/menu', 'MenuController', ['except' => ['create']])->names('auth_menus');
 });
