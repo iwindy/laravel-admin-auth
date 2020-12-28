@@ -130,7 +130,7 @@ class UserController extends BaseController
         $form->hidden('permissions.id')->value($id);
 
         $form->checkboxGroup('permissions.list', trans('admin.permissions'))->options(function () {
-            $permissions = Permission::where('guard_name', config('auth.defaults.guard'))->get()->toArray();
+            $permissions = Permission::where('guard_name', config('admin.auth.guard'))->get()->toArray();
             $new_permissions = [];
             foreach ($permissions as $keys => $values) {
                 if (strpos($values['name'], '.') !== false) {
