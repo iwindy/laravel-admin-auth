@@ -9,6 +9,7 @@ use Encore\Admin\Show;
 use Encore\Admin\Table;
 use Illuminate\Support\Facades\Auth;
 use Iwindy\Auth\Table\Actions\Users\SetPermissions;
+use Request;
 use Spatie\Permission\Models\Permission;
 
 class UserController extends BaseController
@@ -31,7 +32,16 @@ class UserController extends BaseController
         $userModel = config('admin.database.users_model');
 
         $table = new Table(new $userModel());
-
+        // 禁用导出数据
+        $table->disableExport();
+        // 筛选
+        $table->filter(function($filter){
+            // 去掉默认的id过滤器
+            $filter->disableIdFilter();
+            // 在这里添加字段过滤器
+            $filter->like('username', __('auth.username'));
+            $filter->like('name', __('auth.admin_name'));
+        });
         $table->column('id', 'ID')->sortable();
         $table->column('username', trans('auth.username'));
         $table->column('name', trans('auth.admin_name'));
@@ -120,7 +130,7 @@ class UserController extends BaseController
 
     public function showPermissions(Content $content)
     {
-        $id = \Request::input('id');
+        $id = Request::input('id');
         $userModel = config('admin.database.users_model');
 
         $user = $userModel::findOrFail($id);
@@ -140,7 +150,6 @@ class UserController extends BaseController
                     $new_permissions[$values['name']] = __('auth.' . $values['name']);
                 }
             }
-            // dd($new_permissions);
             return $new_permissions;
         })->checked($user->permissions->pluck('name'));
 
@@ -150,7 +159,7 @@ class UserController extends BaseController
             // 去掉`列表`按钮
             // $tools->disableList();
             // 去掉`删除`按钮
-            // $tools->disableDelete();
+            $tools->disableDelete();
             // 去掉`查看`按钮
             $tools->disableView();
         });
@@ -159,8 +168,8 @@ class UserController extends BaseController
 
     public function setPermissions(Content $content)
     {
-        $id = \Request::input('permissions.id');
-        $permissions = \Request::input('permissions.list');
+        $id = Request::input('permissions.id');
+        $permissions = Request::input('permissions.list');
         $userModel = config('admin.database.users_model');
         $user = $userModel::findOrFail($id);
 
@@ -174,7 +183,7 @@ class UserController extends BaseController
         }
 
         return response()->json([
-            'status'  => true,
+            'status' => true,
             'message' => '编辑成功'
         ]);
     }
