@@ -13,7 +13,7 @@
 
         @foreach($options as $group => $labels)
             @if(is_array($labels))
-                <div class="row">
+                <div class="row check-group">
                     <div class="col-2">
                         <span class="icheck-@color">
                             <input type="checkbox" id="@id" class="{{ $checkAllClass }}"/>
@@ -62,7 +62,7 @@
                 });
             }
         }
-        $.each($('#{{ $column }} .row {{ $selector }}'), function() {
+        $.each($('.form-group .row {{ $selector }}'), function() {
             checkGroup(this);
         });
         $('.{{ $checkAllClass }}').change(function () {
@@ -72,7 +72,7 @@
             checkGroup(this);
         });
         function checkGroup(field) {
-            var group_fields = $(field).parents('.row:first');
+            var group_fields = $(field).parents('.check-group');
             var fields = group_fields.find('{{ $selector }}').length;
             var checked_fields = group_fields.find('{{ $selector }}:checked').length;
             group_fields.find('.{{ $checkAllClass }}').prop('checked', checked_fields === fields);
