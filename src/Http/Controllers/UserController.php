@@ -30,8 +30,8 @@ class UserController extends BaseController
     protected function table()
     {
         $userModel = config('admin.database.users_model');
-
-        $table = new Table(new $userModel());
+        $user = new $userModel();
+        $table = new Table($user);
         // 禁用导出数据
         $table->disableExport();
         // 筛选
@@ -48,9 +48,8 @@ class UserController extends BaseController
         $table->column('created_at', trans('admin.created_at'));
         $table->column('is_enable', trans('auth.status'))->using([0 => '禁用', 1 => '启用']);
 
-
-        $table->actions(function (Table\Displayers\Actions $actions) {
-            if ($actions->getKey() == 1) {
+        $table->actions(function (Table\Displayers\Actions $actions) use ($user) {
+            if ($actions->getKey() == 1 && $user->rootAdminId()) {
                 $actions->disableDelete();
             }
             $actions->add(new SetPermissions());

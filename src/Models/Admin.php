@@ -11,4 +11,12 @@ class Admin extends Administrator
 {
     use HasPermissions;
 
+    /**
+     * @var int 超级管理员ID
+     */
+    protected $rootAdminId;
+
+    public function rootAdminId(){
+        $this->rootAdminId = 1;
+    }
 }

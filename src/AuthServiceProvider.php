@@ -28,15 +28,13 @@ class AuthServiceProvider extends ServiceProvider
             );
         }
 
-        if ($this->app->runningInConsole() && $lang = $extension->lang()) {
-            $this->publishes([$lang => resource_path('lang')], 'lang');
-        }
-
         if ($this->app->runningInConsole()) {
-            $this->publishes(
-                [__DIR__ . '/../routes/web.php' => admin_path('routes.php')],
-                'routes'
-            );
+            $this->publishes([
+                __DIR__ . '/../resources/lang' => resource_path('lang')
+            ], 'lang');
+            $this->publishes([
+                __DIR__ . '/../routes/web.php' => admin_path('routes.php')
+            ], 'routes');
         }
 
         Form::extend('checkboxGroup', CheckboxGroup::class);
