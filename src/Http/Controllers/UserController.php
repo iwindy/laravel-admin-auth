@@ -49,7 +49,7 @@ class UserController extends BaseController
         $table->column('is_enable', trans('auth.status'))->using([0 => '禁用', 1 => '启用']);
 
         $table->actions(function (Table\Displayers\Actions $actions) use ($user) {
-            if ($actions->getKey() == 1 && $user->rootAdminId()) {
+            if ($actions->getKey() == $user->getRootAdminId()) {
                 $actions->disableDelete();
             }
             $actions->add(new SetPermissions());
@@ -82,6 +82,12 @@ class UserController extends BaseController
         $show->field('name', trans('admin.name'));
         $show->field('created_at', trans('admin.created_at'));
         $show->field('updated_at', trans('admin.updated_at'));
+        $show->panel()
+            ->tools(function ($tools) {
+                // $tools->disableEdit();
+                // $tools->disableList();
+                $tools->disableDelete();
+            });
 
         return $show;
     }
@@ -122,6 +128,11 @@ class UserController extends BaseController
             if ($form->password && $form->model()->password != $form->password) {
                 $form->password = bcrypt($form->password);
             }
+        });
+
+        $form->tools(function (Form\Tools $tools) {
+            // 去掉`删除`按钮
+            $tools->disableDelete();
         });
 
         return $form;

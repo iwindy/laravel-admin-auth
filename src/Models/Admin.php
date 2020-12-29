@@ -16,7 +16,7 @@ class Admin extends Administrator
      */
     protected $rootAdminId;
 
-    public function rootAdminId(){
-        $this->rootAdminId = 1;
+    public function getRootAdminId(){
+        return 1;
     }
 }
