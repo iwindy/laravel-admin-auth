@@ -17,7 +17,7 @@ class AuthController extends Controller
     /**
      * @var string
      */
-    protected $loginView = 'admin::login';
+    protected $loginView = 'admin-auth::auth.login';
 
     /**
      * Show the login page.
@@ -72,6 +72,7 @@ class AuthController extends Controller
         return Validator::make($data, [
             $this->username()   => 'required',
             'password'          => 'required',
+            'captcha'           => 'required|captcha',
         ]);
     }
 
