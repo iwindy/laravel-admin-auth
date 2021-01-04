@@ -47,9 +47,9 @@ class UserController extends BaseController
         $table->column('name', trans('auth.admin_name'));
         $table->column('created_at', trans('admin.created_at'));
         $table->column('is_enable', trans('auth.status'))->using([0 => '禁用', 1 => '启用']);
-
-        $table->actions(function (Table\Displayers\Actions $actions) use ($user) {
-            if ($actions->getKey() == $user->getRootAdminId()) {
+        $adminId = $user->getRootAdminId();
+        $table->actions(function (Table\Displayers\Actions $actions) use ($adminId) {
+            if ($actions->getKey() == $adminId) {
                 $actions->disableDelete();
             }
             $actions->add(new SetPermissions());

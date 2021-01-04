@@ -89,7 +89,7 @@
 
                         </div>
                         <div class="row">
-                            <div class="col-8">
+                            <div class="col-4">
                                 <div class="icheck-@color">
                                     <input type="checkbox" id="remember" name="remember"
                                            value="1" {{ (!old('username') || old('remember')) ? 'checked' : '' }}>
@@ -97,6 +97,9 @@
                                         {{ admin_trans('admin.remember_me') }}
                                     </label>
                                 </div>
+                            </div>
+                            <div class="col-4 d-flex align-items-center">
+                                <a href="javascript:">忘记密码</a>
                             </div>
                             <!-- /.col -->
                             <div class="col-4">
